@@ -1,42 +1,33 @@
 {
-  "name": "nba-stats-db",
+  "name": "nba-mongo-demo",
   "version": "1.0.0",
-  "private": true,
-  "description": "NBA Stats Web App bootstrapped with Create React App and MongoDB",
+  "description": "NBA stats demo application with Express backend, MongoDB Atlas / in-memory fallback, and React frontend",
   "main": "server.js",
-  "proxy": "http://localhost:5050",
   "scripts": {
-    "start": "concurrently -n \"API,APP\" -c \"blue,green\" \"node server.js\" \"react-scripts start\"",
-    "client": "react-scripts start",
+    "start": "node server.js",
     "server": "node server.js",
-    "build": "react-scripts build",
-    "test": "react-scripts test --watchAll=false"
+    "client": "npm start --prefix nba-frontend",
+    "dev": "concurrently -n \"API,CLIENT\" -c \"blue,green\" \"npm run server\" \"npm run client\"",
+    "seed": "node mongodbExample.js",
+    "test": "npm test --prefix nba-frontend -- --watchAll=false",
+    "build": "npm run build --prefix nba-frontend"
   },
+  "keywords": [
+    "nba",
+    "mongodb",
+    "express",
+    "react"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongodb": "^7.1.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^16.3.3",
-    "concurrently": "^8.2.2"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "concurrently": "^10.0.5"
   }
 }
