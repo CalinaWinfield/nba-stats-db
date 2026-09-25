@@ -1,4 +1,4 @@
-# 🏀 NBA Stats & Games MongoDB Demo
+# 🏀 'Advanced' NBA Stats & Games MongoDB Demo
 
 A full-stack demonstration application showing how to store, query, and visualize **NBA Games, Matchup Scoreboards, and Player Box Scores** using **Express**, **MongoDB** (with automatic in-memory demo fallback), and **React**.
 
