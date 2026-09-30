@@ -85,7 +85,7 @@ If `MONGODB_URI` is unconfigured, unreachable, or DNS cannot be resolved, the ba
 
 - **Matchup Scoreboards**: Scoreboard cards showing Away vs Home teams, game IDs, dates, and actual final team scores from the database.
 - **Per-Game Box Scores**: Detailed box score tables displaying player stats (`PTS`, `REB`, `AST`, `STL`, `BLK`, `MIN`).
-- **All Players Leaderboard**: Comprehensive master table of all player performances across all games.
+- **All Players Leaderboard**: Comprehensive master table showing each player once with their highest-scoring game performance across all matchups.
 - **Isolated 3-State Column Sorting**:
   - **1st click**: Ascending (`▲`)
   - **2nd click**: Descending (`▼`)

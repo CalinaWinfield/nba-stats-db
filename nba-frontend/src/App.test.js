@@ -212,3 +212,89 @@ test("switches between Game Matchups and All Players tabs", async () => {
   expect(screen.getByText(/All Players Statistics/i)).toBeInTheDocument();
   expect(screen.getByText("Opponent")).toBeInTheDocument();
 });
+
+test("shows each player only once on the All Players leaderboard with their most points", async () => {
+  const gamesWithDuplicates = [
+    {
+      _id: "game1",
+      game_id: 10,
+      game_date: "2026-01-10",
+      home_team: { team_id: 1, team_name: "Hawks", team_score: 100 },
+      away_team: { team_id: 2, team_name: "Bucks", team_score: 95 },
+      players: [
+        {
+          player_id: 103,
+          name: "Trae Young",
+          team_id: 1,
+          stats: { points: 28, rebounds: 3, assists: 10, steals: 1, blocks: 0, minutes: 35 },
+        },
+        {
+          player_id: 109,
+          name: "Giannis Antetokounmpo",
+          team_id: 2,
+          stats: { points: 33, rebounds: 11, assists: 4, steals: 1, blocks: 2, minutes: 34 },
+        },
+      ],
+    },
+    {
+      _id: "game2",
+      game_id: 20,
+      game_date: "2026-02-15",
+      home_team: { team_id: 2, team_name: "Bucks", team_score: 115 },
+      away_team: { team_id: 1, team_name: "Hawks", team_score: 110 },
+      players: [
+        {
+          player_id: 103,
+          name: "Trae Young",
+          team_id: 1,
+          stats: { points: 22, rebounds: 5, assists: 8, steals: 0, blocks: 0, minutes: 36 },
+        },
+        {
+          player_id: 109,
+          name: "Giannis Antetokounmpo",
+          team_id: 2,
+          stats: { points: 42, rebounds: 14, assists: 6, steals: 2, blocks: 3, minutes: 38 },
+        },
+      ],
+    },
+  ];
+
+  global.fetch = jest.fn((url) => {
+    if (String(url).includes("/api/status")) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ status: "ok", mode: "mongodb", database: "stats", collection: "games" }),
+      });
+    }
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(gamesWithDuplicates),
+    });
+  });
+
+  render(<App />);
+  await waitFor(() => {
+    expect(
+      screen.getByRole("tab", { name: /all players leaderboard \(2\)/i })
+    ).toBeInTheDocument();
+  });
+
+  const playersTab = screen.getByRole("tab", { name: /all players leaderboard \(2\)/i });
+  fireEvent.click(playersTab);
+
+  // Each player should only appear once in the leaderboard table
+  const traeInstances = screen.getAllByText("Trae Young");
+  expect(traeInstances).toHaveLength(1);
+
+  const giannisInstances = screen.getAllByText("Giannis Antetokounmpo");
+  expect(giannisInstances).toHaveLength(1);
+
+  // Trae Young must show their highest points (28), not 22
+  expect(screen.getByText("28")).toBeInTheDocument();
+  expect(screen.queryByText("22")).toBeNull();
+
+  // Giannis must show their highest points (42), not 33
+  expect(screen.getByText("42")).toBeInTheDocument();
+  expect(screen.queryByText("33")).toBeNull();
+});
+

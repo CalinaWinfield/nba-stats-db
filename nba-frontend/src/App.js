@@ -347,9 +347,11 @@ function App() {
     setLeaderboardSortConfig((prev) => getNextSortConfig(prev, key));
   };
 
-  // Flatten games into individual player records for leaderboard
+  // Flatten games into individual player records for leaderboard,
+  // showing each player only once with their highest scoring performance.
   const allPlayers = useMemo(() => {
-    const list = [];
+    const playerMap = new Map();
+
     games.forEach((game) => {
       const homeTeam = game.home_team || {};
       const awayTeam = game.away_team || {};
@@ -359,7 +361,7 @@ function App() {
         const team = isHome ? homeTeam.team_name : awayTeam.team_name;
         const opponent = isHome ? awayTeam.team_name : homeTeam.team_name;
 
-        list.push({
+        const record = {
           _id: `${game.game_id || game._id}_${p.player_id}`,
           game_id: game.game_id,
           game_date: game.game_date,
@@ -374,10 +376,30 @@ function App() {
           steals: p.stats?.steals ?? 0,
           blocks: p.stats?.blocks ?? 0,
           minutes: p.stats?.minutes ?? 0,
-        });
+        };
+
+        const playerKey = (p.name && p.name.trim())
+          ? p.name.trim().toLowerCase()
+          : (p.player_id != null ? String(p.player_id) : null);
+
+        if (!playerKey) {
+          playerMap.set(record._id, record);
+          return;
+        }
+
+        const existing = playerMap.get(playerKey);
+        if (
+          !existing ||
+          record.points > existing.points ||
+          (record.points === existing.points &&
+            new Date(record.game_date) > new Date(existing.game_date))
+        ) {
+          playerMap.set(playerKey, record);
+        }
       });
     });
-    return list;
+
+    return Array.from(playerMap.values());
   }, [games]);
 
   // Filtered games based on dropdown selection
@@ -508,7 +530,7 @@ function App() {
           <div className="card-header">
             <h2 className="card-title">👤 All Players Statistics</h2>
             <p className="card-subtitle">
-              Comprehensive player stats across all recorded games. Click any column header to sort.
+              Top performance per player (highest points) across all recorded games. Click any column header to sort.
             </p>
           </div>
           <div className="table-wrapper">
